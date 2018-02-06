@@ -1,0 +1,57 @@
+L3_community contains a set of scripts designed to run all the builder community tests
+within our Docker containers.
+
+list_scripts.sh
+    Stores names of community repos, along with a set of associative arrays containing 
+    information for each repo:
+    enabled      - run the tests for this repo or not.
+    repo_commits - Hardcoded commit for the custom run scripts to check out**.
+    failures     - Will collect error codes for each repo.
+    timings      - Will collect approximate timing in seconds for each repo. 
+
+test.sh
+    Master script to run all enabled L3 tests.  
+    Works by cloning https://github.com/pytorch/builder.git, checking out a hardcoded 
+    commit hash**, then going into each community repo's directory in 
+    builder/test_community_repos, and sourcing a custom run script 
+    (see "custom_runfiles" below).
+    
+    test.sh is set up such that each custom run script is run with strict error checking, 
+    but test.sh itself will not quit if an individual run script errors; 
+    instead, test.sh will record the error code and proceed to the script for the next repo.
+    test.sh also records approximate timings for each repo so we can spot anything glaring.
+    Recorded error codes and timings are printed to the console at the end of execution.
+
+custom_runfiles
+    List of run scripts for each community repo.  These are intended to duplicate the functionality
+    of the existing "run.sh" files within each community repo, with three differences:
+    1.  Each custom <reponame>_run.sh checks out a hardcoded commit hash** after 
+        cloning the community repo.
+    2.  Any subscripts are run with strict exit-on-error and command printing ("-ex").  
+        Some of the community repos are set up to forward error codes from the Python 
+        command already, but this provides some additional safety. 
+    3.  Each <reponame>_run.sh also makes whatever (hopefully minor) changes are necessary
+        to get that particular repo to run within our container, e.g. apt-get or sed commands.  
+
+**check_commits.sh
+    Whenever test.sh or a custom run script clones a repo, before checking out the hardcoded 
+    hash stored in repo_commits, check_commits.sh is used to compare the cloned hash with the 
+    hardcoded hash.  check_commits.sh prints whether the cloned hash matches 
+    the stored hash or not.
+ 
+    This functionality could probably be duplicated by adding builder and community repos
+    as git subrepos, but we are wrangling plenty of subrepos within our containers already.
+    For now, cloning + checking out hardcoded hashes (and manually updating the hardcoded 
+    hashes every now and then) is satisfactory.
+
+print_banner.sh
+    Utility to pretty-print a conspicuous message.
+
+diffs.sh:
+    Utility to print differences between custom run scripts and run.sh files present in 
+    builder/test_community_repos/<reponames>.  Intended to be run after 
+    git clone https://github.com/pytorch/builder.git.
+
+minimal_wrapper.sh:
+    Utility that mimics the operation of test.sh for a single repo.  Intended to be run from the 
+    same location as a community repo's run.sh (see comments in minimal_wrapper.sh).

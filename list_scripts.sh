@@ -45,11 +45,11 @@ enabled=(
 [block]=true # true
 [cyclegan]=true # true
 [densenet]=true # true
-[diracnets]=false # investigate 
+[diracnets]=true # true
 [drn]=false 
 [examples/dcgan]=true # true
-[examples/fast_neural_style]=false
-[examples/imagenet]=false
+[examples/fast_neural_style]=false # investigate
+[examples/imagenet]=false # investigate 
 [examples/mnist]=true # true 
 [examples/mnist_hogwild]=false # investigate
 [examples/regression]=true # true
@@ -72,7 +72,7 @@ enabled=(
 [vqa]=false
 )
 
-examples_commit=e11e079
+examples_commit=963f7d1
 declare -A repo_commits
 repo_commits=(
 [DrQA]=aaaaaa
@@ -82,7 +82,7 @@ repo_commits=(
 [block]=67289be
 [cyclegan]=7a5e2cd
 [densenet]=d1cd5e1
-[diracnets]=8e85151
+[diracnets]=ab0bdc5
 [drn]=4bd4024
 [examples/dcgan]=$examples_commit
 [examples/fast_neural_style]=$examples_commit
